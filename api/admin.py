@@ -3,6 +3,11 @@ from .models import *
 from django.contrib.auth.models import User
 
 
+admin.site.site_header = 'Belnu SIB3 Administracion'
+admin.site.site_title = 'Belnu SIB3 | Admin Panel'
+admin.site.index_title = 'Belnu - SIB3 Bases de Datos'
+
+
 class ProveedoresAdmin(admin.ModelAdmin):
     save_on_top = True
     model = Proveedores
@@ -62,6 +67,17 @@ class ProductosAdmin(admin.ModelAdmin):
 class SalidasAdmin(admin.ModelAdmin):
     pass
 
+
+class UsersAdmin(admin.ModelAdmin):
+    ordering = ['id']
+    readonly_fields = ['id', 'created_at', 'last_login']
+    fieldsets = [
+        (None, {'fields': ['id', 'first_name', 'last_name', 'email',
+         'last_login', 'created_at', 'is_staff', 'is_admin', 'password']}),
+    ]
+
+
+admin.site.register(Usuarios, UsersAdmin)
 
 # Register your models here.
 admin.site.register(Proveedores, ProveedoresAdmin)

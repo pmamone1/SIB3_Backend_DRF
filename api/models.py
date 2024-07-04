@@ -1,23 +1,23 @@
 from datetime import timezone
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, BaseUserManager, AbstractBaseUser
 
 
 ######## Tablas #########
-ESTADOS = {
-    "Pendiente": "Pendiente",
-    "Vencido": "Vencido",
-    "Liquidado": "Liquidado",
-}
+ESTADOS = (
+    ("Pendiente", "Pendiente"),
+    ("Vencido", "Vencido"),
+    ("Liquidado", "Liquidado"),
+)
 
-TIPO_DOCUMENTO = {
-    "FC": "FC",
-    "FCE": "FCE",
-    "NC": "NC",
-    "NCE": "NCE",
-    "ND": "ND",
-}
+TIPO_DOCUMENTO = (
+    ("FC", "FC"),
+    ("FCE", "FCE"),
+    ("NC", "NC"),
+    ("NCE", "NCE"),
+    ("ND", "ND"),
+)
 
 TIPO_PAGO = (
     ('Cta_cte', 'Cta_cte'),
@@ -164,3 +164,50 @@ class Salidas(models.Model):
     fecha_pago = models.DateField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, first_name, last_name):
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, first_name=first_name,
+                          last_name=last_name)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, first_name, last_name):
+        user = self.create_user(email, first_name, last_name)
+        user.is_admin = True
+        user.is_staff = True
+        user.save(using=self._db)
+        return user
+
+
+class Usuarios(AbstractBaseUser):
+    id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'username'
+
+    objects = UserManager()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return str(self.id) + '. ' + self.username
+
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+
+    def has_module_perms(self, app_label):
+        return True
+
+    class Meta:
+        db_table = 'Usuario'
+        verbose_name_plural = 'Usuarios'

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import *
 from rest_framework import viewsets, permissions
-from .serializer import AgenteSerializer, ProveedorSerializer, PagoSerializer, CuentaSerializer, ProductoSerializer, SalidaSerializer, UserSerializer, ImagenPagosSerializer
+from .serializer import AgenteSerializer, ProveedorSerializer, PagoSerializer, CuentaSerializer, ProductoSerializer, SalidaSerializer, UserSerializer, ImagenPagosSerializer, UsuariosSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -67,7 +67,13 @@ class SalidasViewSet(viewsets.ModelViewSet):
     serializer_class = SalidaSerializer
 
 
-@api_view(['POST'])
+class UsuariosViewSet(viewsets.ModelViewSet):
+    queryset = Usuarios.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = UsuariosSerializer
+
+
+@api_view(['POST', 'GET',])
 def login(request):
     user = get_object_or_404(User, username=request.data['username'])
     if not user.check_password(request.data['password']):
@@ -82,11 +88,20 @@ def login(request):
 @api_view(['POST'])
 def register(request):
     serializer = UserSerializer(data=request.data)
+    print(serializer)
     if serializer.is_valid():
         serializer.save()
 
         user = User.objects.get(username=serializer.data['username'])
         user.set_password(serializer.data['password'])
+        # if serializer.data.first_name == serializer.data.last_name:
+        print(serializer.data['username'])
+        print(serializer.data['first_name'])
+
+        user.first_name = serializer.data['first_name'].title()
+        user.last_name = serializer.data['last_name'].title()
+        user.is_staff = serializer.data['is_staff']
+
         user.save()
 
         token = Token.objects.create(user=user)

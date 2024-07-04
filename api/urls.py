@@ -1,5 +1,5 @@
 from django.urls import path, re_path
-from .views import AgenteViewSet, SalidasViewSet, ProductoViewSet, ProveedorViewSet, PagoViewSet, CuentaViewSet, ImagenPagoViewSet
+from .views import AgenteViewSet, SalidasViewSet, ProductoViewSet, ProveedorViewSet, PagoViewSet, CuentaViewSet, ImagenPagoViewSet, UsuariosViewSet
 from . import views
 from rest_framework import routers
 
@@ -12,5 +12,5 @@ router.register('api/proveedores', ProveedorViewSet, 'proveedores'),
 router.register('api/producto', ProductoViewSet, 'productos'),
 router.register('api/salidas', SalidasViewSet, 'salidas'),
 router.register('api/cuenta', CuentaViewSet, 'cuenta'),
-
+router.register('api/usuarios', UsuariosViewSet, 'usuarios'),
 urlpatterns = router.urls

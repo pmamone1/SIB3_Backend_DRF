@@ -3,11 +3,23 @@ from .models import *
 from django.contrib.auth.models import User
 
 
+class UsuariosSerializer(ModelSerializer):
+    class Meta:
+        models = Usuarios
+        fields = "__all__"
+
+
 class AgenteSerializer(ModelSerializer):
     class Meta:
         model = Agentes
         fields = '__all__'
         read_only_fields = ('id', "created", "updated",)
+
+
+class AccountSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class ImagenPagosSerializer(ModelSerializer):
